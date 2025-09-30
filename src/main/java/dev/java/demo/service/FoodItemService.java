@@ -30,9 +30,10 @@ public class FoodItemService {
         return foodItem.map(mapper::map).orElse(null);
     }
     //POST
-    public void Create(FoodItemDTO foodItemDTO){
+    public FoodItemDTO Create(FoodItemDTO foodItemDTO){
         FoodItem foodItem = mapper.map(foodItemDTO);
         repository.save(foodItem);
+        return foodItemDTO;
     }
 
     //Delete
