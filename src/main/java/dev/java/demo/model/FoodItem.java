@@ -1,8 +1,7 @@
 package dev.java.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import dev.java.demo.category.foodCategory;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,10 +14,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 public class FoodItem {
-    @Id()
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private Integer quantity;
+    @Enumerated(EnumType.STRING)
+    private foodCategory category;
     private LocalDate expirationDate;
 
 }
