@@ -1,6 +1,6 @@
 package dev.java.demo.model;
 
-import dev.java.demo.category.foodCategory;
+import dev.java.demo.enums.foodCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

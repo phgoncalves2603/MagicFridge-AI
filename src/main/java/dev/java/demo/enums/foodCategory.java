@@ -1,4 +1,4 @@
-package dev.java.demo.category;
+package dev.java.demo.enums;
 
 public enum foodCategory {
     VEGETABLE,
