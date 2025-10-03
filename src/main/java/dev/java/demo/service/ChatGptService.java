@@ -14,7 +14,7 @@ import java.util.Map;
 public class ChatGptService {
 
     private final WebClient webClient;
-    private String apiKey = System.getenv("API_KEY");
+    private final String apiKey = System.getenv("API_KEY");
     public ChatGptService(WebClient webClient) {
         this.webClient = webClient;
     }
