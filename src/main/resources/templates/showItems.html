@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagicFridge AI</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f9fafb;
+            color: #111;
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        form {
+            display: flex;
+            gap: .5rem;
+            margin-bottom: 1rem;
+        }
+        input[type=text] {
+            flex: 1;
+            padding: .6rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: .6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        ul {
+            padding: 0;
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+        ul li {
+            display: inline-block;
+            background: #f3f4f6;
+            padding: .3rem .7rem;
+            margin: .2rem;
+            border-radius: 20px;
+            font-size: .9rem;
+        }
+        .recipes {
+            margin-top: 1rem;
+        }
+        .recipe {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>MagicFridge AI</h1>
+
+    <!-- Add item -->
+    <form th:action="@{/add-item}" method="post">
+        <input type="text" name="item" placeholder="Add fridge item..." />
+        <button type="submit">Add</button>
+    </form>
+
+    <!-- Items list -->
+    <ul>
+        <li th:each="it, iStat : ${items}">
+            <span th:text="${it}"></span>
+            <a th:href="@{/remove-item(index=${iStat.index})}" style="color:#ef4444; margin-left:.3rem; text-decoration:none;">✕</a>
+        </li>
+    </ul>
+
+    <!-- Generate recipes -->
+    <form th:action="@{/generate-recipe}" method="post">
+        <button type="submit">Generate Recipe</button>
+    </form>
+
+    <!-- Recipes -->
+    <div class="recipes" th:if="${recipes != null}">
+        <div class="recipe" th:each="r : ${recipes}">
+            <h3 th:text="${r.title}"></h3>
+            <p><strong>Ingredients:</strong></p>
+            <ul>
+                <li th:each="ing : ${r.ingredients}" th:text="${ing}"></li>
+            </ul>
+            <p><strong>Instructions:</strong></p>
+            <p th:text="${r.instructions}"></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
