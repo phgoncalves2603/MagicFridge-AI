@@ -1,5 +1,6 @@
 package dev.java.demo.service;
 
+import dev.java.demo.dto.FoodItemDTO;
 import dev.java.demo.model.FoodItem;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,7 +22,7 @@ public class GeminiService {
         this.webClient = webClientBuilder.baseUrl("https://generativelanguage.googleapis.com/v1beta/models").build();
     }
 
-    public Mono<String> generateRecipe(List<FoodItem> foodItems) {
+    public Mono<String> generateRecipe(List<FoodItemDTO> foodItems) {
         String food = foodItems.stream()
                 .map(item -> String.format("%s (%s) - Quantity: %d, experation date: %s",
                         item.getName(), item.getCategory(), item.getQuantity(), item.getExpirationDate()))
