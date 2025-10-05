@@ -1,6 +1,7 @@
 package dev.java.demo.controller;
 
 import dev.java.demo.service.ChatGptService;
+import dev.java.demo.service.FoodItemService;
 import dev.java.demo.service.GeminiService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,10 +13,12 @@ import reactor.core.publisher.Mono;
 public class RecipeControler {
     //ChatGptService chatGptService;
     GeminiService geminiService;
+    FoodItemService foodItemService;
 
-    public RecipeControler(ChatGptService chatGptService, GeminiService geminiService){
-        //this.chatGptService = chatGptService;
+    public RecipeControler(ChatGptService chatGptService, GeminiService geminiService, FoodItemService foodItemService){
         this.geminiService = geminiService;
+        this.foodItemService = foodItemService;
+
     }
 //    @GetMapping("/generate")
 //    public Mono<ResponseEntity<String>> generateRecipe(){
@@ -25,7 +28,8 @@ public class RecipeControler {
 //    }
     @GetMapping("/gemini")
     public Mono<ResponseEntity<String>> generateRecipeGemini(){
-        return geminiService.generateRecipe()
+
+        return geminiService.generateRecipe(foodItemService.showAll())
                 .map(recipe -> ResponseEntity.ok(recipe))
                 .defaultIfEmpty(ResponseEntity.noContent().build());
     }
