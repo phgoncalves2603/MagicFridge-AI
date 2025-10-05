@@ -1,109 +1,182 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MagicFridge AI</title>
     <style>
         body {
-            font-family: system-ui, sans-serif;
-            background: #f9fafb;
-            color: #111;
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
-            padding: 2rem;
+            margin: 0;
+            height: 100vh;
+            background-color: #f7f7f7;
         }
-        .card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            max-width: 600px;
-            width: 100%;
-        }
-        h1 {
-            margin-top: 0;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        form {
-            display: flex;
-            gap: .5rem;
-            margin-bottom: 1rem;
-        }
-        input[type=text] {
+
+        .left, .right {
             flex: 1;
-            padding: .6rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 20px;
         }
+
+        .left {
+            background-color: #ffffff;
+            border-right: 2px solid #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .right {
+            background-color: #fafafa;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .item-list li {
+            background-color: #e6f3ff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 10px;
+        }
+
+        .form-container {
+            display: none;
+            background-color: #f2f2f2;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
         button {
-            background: #2563eb;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: #007bff;
             color: white;
             border: none;
-            padding: .6rem 1rem;
             border-radius: 6px;
             cursor: pointer;
         }
-        ul {
-            padding: 0;
-            list-style: none;
-            margin-bottom: 1rem;
+
+        button:hover {
+            background-color: #0056b3;
         }
-        ul li {
-            display: inline-block;
-            background: #f3f4f6;
-            padding: .3rem .7rem;
-            margin: .2rem;
-            border-radius: 20px;
-            font-size: .9rem;
-        }
-        .recipes {
-            margin-top: 1rem;
-        }
-        .recipe {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: #f9fafb;
-            border-radius: 8px;
+
+        #recipe {
+            white-space: pre-wrap;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 80vh;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-<div class="card">
-    <h1>MagicFridge AI</h1>
+<!-- Left Side -->
+<div class="left">
+    <h2>My Ingredients</h2>
+    <ul id="itemList" class="item-list"></ul>
+    <button onclick="toggleForm()">+ Add Item</button>
 
-    <!-- Add item -->
-    <form th:action="@{/add-item}" method="post">
-        <input type="text" name="item" placeholder="Add fridge item..." />
-        <button type="submit">Add</button>
-    </form>
+    <div id="formContainer" class="form-container">
+        <label>Name:</label>
+        <input type="text" id="name" placeholder="e.g. Tomato">
 
-    <!-- Items list -->
-    <ul>
-        <li th:each="it, iStat : ${items}">
-            <span th:text="${it}"></span>
-            <a th:href="@{/remove-item(index=${iStat.index})}" style="color:#ef4444; margin-left:.3rem; text-decoration:none;">✕</a>
-        </li>
-    </ul>
+        <label>Quantity:</label>
+        <input type="number" id="quantity" placeholder="e.g. 2">
 
-    <!-- Generate recipes -->
-    <form th:action="@{/generate-recipe}" method="post">
-        <button type="submit">Generate Recipe</button>
-    </form>
+        <label>Expiration Date:</label>
+        <input type="date" id="expirationDate">
 
-    <!-- Recipes -->
-    <div class="recipes" th:if="${recipes != null}">
-        <div class="recipe" th:each="r : ${recipes}">
-            <h3 th:text="${r.title}"></h3>
-            <p><strong>Ingredients:</strong></p>
-            <ul>
-                <li th:each="ing : ${r.ingredients}" th:text="${ing}"></li>
-            </ul>
-            <p><strong>Instructions:</strong></p>
-            <p th:text="${r.instructions}"></p>
-        </div>
+        <label>Category:</label>
+        <select id="category">
+            <option value="VEGETABLE">Vegetable</option>
+            <option value="FRUIT">Fruit</option>
+            <option value="MEAT">Meat</option>
+            <option value="DAIRY">Dairy</option>
+            <option value="GRAIN">Grain</option>
+        </select>
+
+        <button onclick="addItem()">Save Item</button>
     </div>
+
 </div>
+
+<!-- Right Side -->
+<div class="right">
+    <h2>Generated Recipe</h2>
+    <button onclick="generateRecipe()">🍳 Generate Recipe</button>
+    <div id="recipe">Your recipe will appear here...</div>
+</div>
+
+<script>
+    const itemList = document.getElementById('itemList');
+    const formContainer = document.getElementById('formContainer');
+
+    // Load all items
+    async function loadItems() {
+        const response = await fetch('/FoodItem/ShowAll');
+        const items = await response.json();
+        itemList.innerHTML = '';
+        items.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.name} (${item.quantity}) - Exp: ${item.expirationDate}`;
+            itemList.appendChild(li);
+        });
+    }
+
+    // Add item
+    async function addItem() {
+        const name = document.getElementById('name').value;
+        const quantity = document.getElementById('quantity').value;
+        const expirationDate = document.getElementById('expirationDate').value;
+
+        await fetch('/FoodItem/addItem', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ name, quantity, expirationDate })
+        });
+
+        toggleForm();
+        await loadItems();
+    }
+
+    // Toggle form display
+    function toggleForm() {
+        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Generate recipe using Gemini API
+    async function generateRecipe() {
+        const recipeDiv = document.getElementById('recipe');
+        recipeDiv.textContent = "Generating recipe...";
+        const response = await fetch('/gemini');
+        if (response.ok) {
+            const text = await response.text();
+            recipeDiv.textContent = text;
+        } else {
+            recipeDiv.textContent = "Error generating recipe 😢";
+        }
+    }
+
+    // Initialize
+    loadItems();
+</script>
 </body>
 </html>
