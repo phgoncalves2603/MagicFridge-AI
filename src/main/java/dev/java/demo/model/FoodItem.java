@@ -21,6 +21,7 @@ public class FoodItem {
     private Integer quantity;
     @Enumerated(EnumType.STRING)
     private foodCategory category;
+    @Column(name = "expiration_date", nullable = false)
     private LocalDate expirationDate;
 
     public Long getId() {
