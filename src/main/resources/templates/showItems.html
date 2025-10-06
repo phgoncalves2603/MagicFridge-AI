@@ -146,16 +146,18 @@
         const name = document.getElementById('name').value;
         const quantity = document.getElementById('quantity').value;
         const expirationDate = document.getElementById('expirationDate').value;
+        const category = document.getElementById('category').value;
 
         await fetch('/FoodItem/addItem', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, quantity, expirationDate })
+            body: JSON.stringify({ name, quantity, expirationDate, category })
         });
 
         toggleForm();
         await loadItems();
     }
+
 
     // Toggle form display
     function toggleForm() {
