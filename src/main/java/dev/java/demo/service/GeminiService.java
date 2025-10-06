@@ -1,5 +1,6 @@
 package dev.java.demo.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import dev.java.demo.dto.FoodItemDTO;
 import dev.java.demo.model.FoodItem;
 import org.springframework.http.HttpHeaders;
@@ -46,6 +47,16 @@ public class GeminiService {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(JsonNode.class)
+                .map(root -> {
+                    JsonNode candidates = root.path("candidates");
+                    if (candidates.isArray() && candidates.size() > 0) {
+                        JsonNode parts = candidates.get(0).path("content").path("parts");
+                        if (parts.isArray() && parts.size() > 0) {
+                            return parts.get(0).path("text").asText();
+                        }
+                    }
+                    return "No recipe found";
+                });
     }
 }
